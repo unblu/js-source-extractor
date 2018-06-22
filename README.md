@@ -2,6 +2,8 @@
 
 An extractor of source code from Javascript libraries containing source maps with embedded or referenced source.
 
+[![NPM version](https://badge.fury.io/js/nodemon.svg)](https://npmjs.org/package/js-source-extractor)
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
