@@ -2,7 +2,7 @@
 
 An extractor of source code from Javascript libraries containing source maps with embedded or referenced source.
 
-[![NPM version](https://badge.fury.io/js/nodemon.svg)](https://npmjs.org/package/js-source-extractor)
+[![NPM version](https://badge.fury.io/js/js-source-extractor.svg)](https://npmjs.org/package/js-source-extractor)
 
 ## Getting Started
 
