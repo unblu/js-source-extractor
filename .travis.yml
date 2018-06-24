@@ -5,6 +5,7 @@ script:
 - npm run build
 - npm test
 deploy:
+  provider: npm
   on:
     tags: true
   api_key:
