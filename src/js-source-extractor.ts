@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*
  * js-source-extractor
  * Copyright(c) 2018 Kay Huber
@@ -15,6 +17,11 @@ import fs from 'fs';
 import path from 'path';
 import url from 'url';
 import mime from 'mime';
+
+/* ********************** */
+/* utilities              */
+/* ********************** */
+
 
 function mkdirPathSync(targetDir: string) {
     const sep = path.sep;
@@ -114,6 +121,10 @@ async function loadMap(resourceUrl: URL, resourceType?: ResourceType): Promise<s
 
     return resourceContent;
 }
+
+/* ********************** */
+/* main exported functionalities */
+/* ********************** */
 
 /**
  * Type of resource. Required if not automatically determinable.
@@ -236,6 +247,87 @@ export async function extractSrc(resourceUrl: URL | null, sourceMap: string | nu
     });
 }
 
+/* ********************** */
+/* exports                */
+/* ********************** */
 exports.ResourceType = ResourceType;
 exports.extractSrcToDir = extractSrcToDir;
 exports.extractSrc = extractSrc;
+
+/* ********************** */
+/* command line           */
+/* ********************** */
+
+interface Options {
+    outDir: string;
+    includePattern?: string;
+    excludePattern?: string;
+}
+
+/**
+ * Command line interface - wrapped in a function for better testability
+ *
+ * ```js
+ * process.exit(cli(process.argv));
+ * ```
+ * @param {string[]} args command line arguments
+ * @returns {number} non-zero numbers indicate an error
+ */
+export function cli(args: string[]): Promise<number> {
+    let packageJSON;
+    try {
+        const contents = fs.readFileSync('package.json').toString('utf-8');
+        packageJSON = JSON.parse(contents);
+    } catch (error) {
+        // ignore for now - no version to specify in this case
+    }
+
+    const program = require('commander');
+
+    if (packageJSON && packageJSON.version) {
+        program.version(packageJSON.version);
+        program.description(packageJSON.description);
+    }
+
+    return new Promise<number>((resolve, reject) => {
+        let resourceUrlPresent = false;
+        program
+            .arguments('<resourceUrl>')
+            .option('-o --outDir <outDir>', 'Base output directory where source files should be output to')
+            .option('-i --include <includePattern>', 'Include pattern to apply when selecting source files for extraction')
+            .option('-e --exclude <excludePattern>', 'Exclude pattern to apply when selecting source files for extraction (executed after include pattern)')
+            .action((resourceUrl: string, options: Options) => {
+                console.log(resourceUrl);
+                resourceUrlPresent = true;
+                let realResourceUrl;
+                try {
+                    realResourceUrl = new URL(resourceUrl);
+                } catch (error) {
+                    reject(new Error("Invalid resourceUrl provided: " + error));
+                    return;
+                }
+
+                extractSrcToDir(realResourceUrl, null, options.outDir, undefined, options.includePattern ? new RegExp(options.includePattern) : undefined, options.excludePattern ? new RegExp(options.excludePattern) : undefined).then(() => resolve(0));
+            });
+
+        program.parse(args);
+        if (!resourceUrlPresent) {
+            console.error('No resource url provided');
+            program.outputHelp();
+            reject(new Error('No resource url provided'));
+            return;
+        }
+    });
+}
+
+// are we "required/imported" or called from command line?
+if (require.main === module) {
+    cli(process.argv)
+        .then((result) => {
+            process.exit(result)
+        })
+        .catch((error) => {
+            process.exit(1);
+        });
+}
+

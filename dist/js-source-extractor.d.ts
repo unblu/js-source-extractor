@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /// <reference types="node" />
 import { URL } from "url";
 /**
@@ -12,6 +13,13 @@ export declare enum ResourceType {
  * Source code files must either be referenced and accessible via information in the source map or be contained in the source map (embedded).
  *
  * The extracted source code is stored in the file system. The directory structure that is provided with the source file path information in the source map will be created automatically.
+ *
+ * Example:
+ * ```js
+ * const baseDir = __dirname + "/../resources";
+ * const outDir = tmpdir() + path.sep + 'js-source-extractor-test'; // directory to store source files in
+ * await extractSrcToDir(new URL(util.format('file://%s/embedded-sourcemap-test.js', baseDir)), outDir);
+ * ```
  *
  * @param {module:url.URL | null} resourceUrl An url (http(s):// or file:// for local file access) to retrieve either a Javascript file or a Source Map file. If null, sourceMap must be specified.
  * @param {string | null} sourceMap Source Map JSON in string form to use directly. Must contain source code or refer with absolute urls to source files. If null, resourceUrl must be specified.
@@ -48,3 +56,13 @@ export declare function extractSrcToDir(resourceUrl: URL | null, sourceMap: stri
  * @returns {Promise<void>} Async function without a direct result (use receiver to receive information)
  */
 export declare function extractSrc(resourceUrl: URL | null, sourceMap: string | null, receiver: (path: string, sourceName: string, source: string | null) => void, resourceType?: ResourceType, srcInclude?: RegExp, srcExclude?: RegExp): Promise<void>;
+/**
+ * Command line interface - wrapped in a function for better testability
+ *
+ * ```js
+ * process.exit(cli(process.argv));
+ * ```
+ * @param {string[]} args command line arguments
+ * @returns {number} non-zero numbers indicate an error
+ */
+export declare function cli(args: string[]): Promise<number>;

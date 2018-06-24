@@ -1,12 +1,13 @@
 {
   "name": "js-source-extractor",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Extracts source from javascript frameworks with sourcemap information (containing the source)",
-  "main": "js-source-extractor.js",
+  "main": "./dist/js-source-extractor.js",
   "scripts": {
     "clean": "rimraf dist",
     "test": "mocha -r ts-node/register src/**/*.spec.ts",
-    "build": "tsc -p tsconfig-dist.json"
+    "build": "tsc -p tsconfig-dist.json",
+    "start": "./dist/js-source-extractor.js"
   },
   "keywords": [
     "javascript",
@@ -30,12 +31,14 @@
     "@types/rimraf": "^2.0.2",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
+    "clear-module": "^2.1.0",
     "mocha": "^5.2.0",
     "rimraf": "^2.6.2",
     "ts-node": "^6.1.2",
     "typescript": "^2.9.2"
   },
   "dependencies": {
+    "commander": "^2.15.1",
     "mime": "^2.3.1",
     "source-map": "^0.7.3"
   }
