@@ -1,6 +1,6 @@
 {
   "name": "js-source-extractor",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Extracts source from javascript frameworks with sourcemap information (containing the source)",
   "main": "./dist/js-source-extractor.js",
   "scripts": {
