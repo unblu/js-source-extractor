@@ -1,6 +1,11 @@
 language: node_js
 node_js:
-  - "8"
+- '8'
 script:
-  - npm run build
-  - npm test
+- npm run build
+- npm test
+deploy:
+  on:
+    tags: true
+  api_key:
+    secure: fb+znmx4804GFDBFY8kfVrdfEXceYg8h/8WGZkfwtu2nLDmmmf3GPWklUiVjuF6qLVXmx5ByaGZajKzFQEmCD24Vy1hrYl0IVGnpONNvjYqNIHxQ3+udhMJi9N+IF4kIx+QwSQq18mT1B9krkCkDbX8uot6tX8IYDijaXnwoLNUnKwyrzs0YF2xgvwn/sDGLbhMCpO+ZQhKkAPw26N80Hi0ajIfu2Kj2PfvEdyV2M9xmt70n9xgXi5CTX1Bpw/2h2VS/DPVDjnH63fQO4UiO/F9qD2SAOKYcmtBGIh+r03eU+BmntGDOOGB86fHa78CV/UAQh2+VeOv5Sj28hlpYtiI7bFGc0u2Y4YwVeHWlryey0T3Off7M2f638EKp2dLdv4a8Wd0rPT9f9ErxrNbssHQXzPbW5OntGN/cCayRHud3chkGGR3zKiiUXePIz6v5rFtQTioMRHvLWVTyvDO0FKXnHpujYqimxe9T8tdSr0gk7/+gp25MLO0jg483OYOp27rT397W/ScUflNdUJMa6r5Px1/Ls5Kpd7/Zcc1NT1vPxiMVKGh08hActZWGqu5gqLjYocSs7bTDedqAA3bDzfX2omtKlfGX8B+baJwRhoZ6PE3PDku1yKsK0qtgn8qwPGNqJiUAGfnqwzjrt8M7C44uqF4uy4uHXU7HT73gPsc=
