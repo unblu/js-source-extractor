@@ -1,6 +1,6 @@
 {
   "name": "js-source-extractor",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Extracts source from javascript frameworks with sourcemap information (containing the source)",
   "main": "./dist/js-source-extractor.js",
   "scripts": {
@@ -9,6 +9,7 @@
     "build": "tsc -p tsconfig-dist.json",
     "start": "./dist/js-source-extractor.js"
   },
+  "bin": "./dist/js-source-extractor.js",
   "keywords": [
     "javascript",
     "source-map",
