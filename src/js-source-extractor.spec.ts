@@ -22,9 +22,9 @@ const baseDir = __dirname + "/../resources";
 const outDir = tmpdir() + path.sep + 'js-source-extractor-test';
 const embeddedSourcemapTestUrl = new URL(util.format('file://%s/embedded-sourcemap-test.js', baseDir));
 const externalSourcemapTestUrl = new URL(util.format('file://%s/external-sourcemap-test.js', baseDir));
-const cleanup = (doResolve: boolean, arg: any) => {
+const cleanup = (doResolve: boolean, arg: any, outDir: string) => {
     return new Promise((resolve, reject) => {
-        console.info('cleaning up temp directory');
+        console.info('cleaning up test directory ' + outDir);
         rimraf(outDir, () => {
             if (doResolve) {
                 resolve(arg);
@@ -44,6 +44,16 @@ describe('Command Line Interface CLI', () => {
         return expect(cli(['/usr/bin/node', __dirname + '/js-source-extractor'])).to.eventually.be.rejected;
     });
 
+    it('With resource url from web', () => {
+        const outDir = process.cwd() + path.sep + 'extract';
+        return expect(cli(['/usr/bin/node', __dirname + '/js-source-extractor', 'https://raw.githubusercontent.com/unblu/js-source-extractor/master/resources/embedded-sourcemap-test.js'])).to.eventually.be.fulfilled
+            .then(() => {
+                const outFileName = outDir + '/src/embedded-sourcemap-test.ts';
+                expect(existsSync(outFileName), 'extracted source file exists').to.be.true;
+                expect(readFileSync(outFileName).toString('utf-8'), 'source code').to.equal('console.log(\'Hello World!\');');
+            }).then((result) => cleanup(true, result, outDir), (error) => cleanup(false, error, outDir));
+    });
+
     it('Sourcemap embedded in Javascript file', () => {
         return expect(cli(['/usr/bin/node', __dirname + '/js-source-extractor', embeddedSourcemapTestUrl.toString(), '--outDir', outDir])).to.eventually.be.fulfilled
             .then(() => {
@@ -51,7 +61,7 @@ describe('Command Line Interface CLI', () => {
                 expect(existsSync(outFileName), 'extracted source file exists').to.be.true;
                 expect(readFileSync(outFileName).toString('utf-8'), 'source code').to.equal('console.log(\'Hello World!\');');
             })
-            .then((result) => cleanup(true, result), (error) => cleanup(false, error));
+            .then((result) => cleanup(true, result, outDir), (error) => cleanup(false, error, outDir));
     });
 });
 
@@ -98,7 +108,7 @@ describe('Module import', () => {
                     expect(existsSync(outFileName)).to.be.true;
                     expect(readFileSync(outFileName).toString('utf-8')).to.equal('console.log(\'Hello World!\');');
                 })
-                .then((result) => cleanup(true, result), (error) => cleanup(false, error));
+                .then((result) => cleanup(true, result, outDir), (error) => cleanup(false, error, outDir));
         });
     });
 

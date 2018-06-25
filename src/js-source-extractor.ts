@@ -65,7 +65,7 @@ function loadResource(resourceUrl: URL): Promise<string> {
                 const result = readFileSync(resourceUrl).toString('UTF-8');
                 resolve(result);
             } catch (error) {
-                console.error(util.format('Problem reading %s: %s', resourceUrl, error));
+                console.error(util.format('Problem reading %s: %s', resourceUrl, error.message ? error.message : error));
                 reject(error);
             }
         }
@@ -156,8 +156,8 @@ export enum ResourceType {
  * @returns {Promise<void>} Async function without a direct result (use receiver to receive information)
  */
 export async function extractSrcToDir(resourceUrl: URL | null, sourceMap: string | null, outDir?: string, resourceType?: ResourceType, srcInclude?: RegExp, srcExclude?: RegExp) {
-    let baseDir: string = __dirname + path.sep + 'extract';
-    if (outDir) {
+    let baseDir: string = process.cwd() + path.sep + 'extract';
+    if (typeof outDir !== 'undefined') {
         baseDir = outDir;
     }
 
@@ -165,12 +165,12 @@ export async function extractSrcToDir(resourceUrl: URL | null, sourceMap: string
         mkdirPathSync(baseDir + path);
 
         try {
-            fs.writeFileSync(outDir + path + sourceName, source);
+            fs.writeFileSync(baseDir + path + sourceName, source);
         } catch (error) {
-            console.error(util.format("Problem while writing file %s: %s", outDir + path + sourceName, error));
+            console.error(util.format("Problem while writing file %s: %s", baseDir + path + sourceName, error));
         }
 
-        console.info(util.format("Source %s written", outDir + path + sourceName));
+        console.info(util.format("Source %s written", baseDir + path + sourceName));
     }, resourceType, srcInclude, srcExclude);
 }
 
@@ -201,8 +201,8 @@ export async function extractSrcToDir(resourceUrl: URL | null, sourceMap: string
  */
 export async function extractSrc(resourceUrl: URL | null, sourceMap: string | null, receiver: (path: string, sourceName: string, source: string | null) => void, resourceType?: ResourceType, srcInclude?: RegExp, srcExclude?: RegExp) {
     let rawMap = sourceMap;
-    if (!rawMap) {
-        if (!resourceUrl) {
+    if (rawMap === null) {
+        if (resourceUrl === null) {
             throw Error('No or invalid sourceMap and no or invalid resourceUrl provided');
         }
 
@@ -210,7 +210,7 @@ export async function extractSrc(resourceUrl: URL | null, sourceMap: string | nu
     }
 
     let srcIncludeEff: RegExp;
-    if (srcInclude) {
+    if (typeof srcInclude !== 'undefined') {
         srcIncludeEff = srcInclude;
     } else {
         srcIncludeEff = /.*/;
@@ -221,7 +221,7 @@ export async function extractSrc(resourceUrl: URL | null, sourceMap: string | nu
         console.info(util.format("Source map references %d source files", consumer.sources.length));
 
         consumer.sources.forEach((sourceRef) => {
-            if (!srcIncludeEff.test(sourceRef) || (srcExclude && srcExclude.test(sourceRef))) {
+            if (!srcIncludeEff.test(sourceRef) || (typeof srcExclude !== 'undefined' && srcExclude.test(sourceRef))) {
                 return;
             }
 
@@ -276,7 +276,8 @@ interface Options {
 export function cli(args: string[]): Promise<number> {
     let packageJSON;
     try {
-        const contents = fs.readFileSync('package.json').toString('utf-8');
+        const pkgPath = __dirname + "/../";
+        const contents = fs.readFileSync(pkgPath + 'package.json').toString('utf-8');
         packageJSON = JSON.parse(contents);
     } catch (error) {
         // ignore for now - no version to specify in this case
@@ -285,7 +286,7 @@ export function cli(args: string[]): Promise<number> {
     const program = require('commander');
 
     if (packageJSON && packageJSON.version) {
-        program.version(packageJSON.version);
+        program.version(packageJSON.version, '-v, --version');
         program.description(packageJSON.description);
     }
 
@@ -293,11 +294,10 @@ export function cli(args: string[]): Promise<number> {
         let resourceUrlPresent = false;
         program
             .arguments('<resourceUrl>')
-            .option('-o --outDir <outDir>', 'Base output directory where source files should be output to')
-            .option('-i --include <includePattern>', 'Include pattern to apply when selecting source files for extraction')
-            .option('-e --exclude <excludePattern>', 'Exclude pattern to apply when selecting source files for extraction (executed after include pattern)')
+            .option('-o, --outDir <outDir>', 'Base output directory where source files should be output to')
+            .option('-i, --include <includePattern>', 'Include pattern to apply when selecting source files for extraction')
+            .option('-e, --exclude <excludePattern>', 'Exclude pattern to apply when selecting source files for extraction (executed after include pattern)')
             .action((resourceUrl: string, options: Options) => {
-                console.log(resourceUrl);
                 resourceUrlPresent = true;
                 let realResourceUrl;
                 try {
