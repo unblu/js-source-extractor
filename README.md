@@ -5,53 +5,60 @@ An extractor of source code from Javascript libraries containing source maps wit
 [![Build Status](https://travis-ci.org/unblu/js-source-extractor.svg?branch=master)](https://travis-ci.org/unblu/js-source-extractor)
 [![NPM version](https://badge.fury.io/js/js-source-extractor.svg)](https://npmjs.org/package/js-source-extractor)
 
-## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+## Install for CLI use
 
-### Install for Node
+```bash
+$ npm install -g js-source-extractor
+```
 
+Example CLI use
+```bash
+$ cd /tmp
+$ js-source-extractor https://raw.githubusercontent.com/unblu/js-source-extractor/master/resources/embedded-sourcemap-test.js
+Loading resource https://raw.githubusercontent.com/unblu/js-source-extractor/master/resources/embedded-sourcemap-test.js to examine (expecting javascript or source map)
+Resource will be treated as a Javascript
+Reading contents of https://raw.githubusercontent.com/unblu/js-source-extractor/master/resources/embedded-sourcemap-test.js
+source map response complete
+Found source map url
+Extracting embedded source map
+Source map references 1 source files
+Source /tmp/extract/src/embedded-sourcemap-test.ts written
+```
+
+To extract files to a specific folder, use `--outDir` like:
+```bash
+$ js-source-extractor https://raw.githubusercontent.com/unblu/js-source-extractor/master/resources/embedded-sourcemap-test.js --outDir /tmp/extract
+Loading resource https://raw.githubusercontent.com/unblu/js-source-extractor/master/resources/embedded-sourcemap-test.js to examine (expecting javascript or source map)
+Resource will be treated as a Javascript
+Reading contents of https://raw.githubusercontent.com/unblu/js-source-extractor/master/resources/embedded-sourcemap-test.js
+source map response complete
+Found source map url
+Extracting embedded source map
+Source map references 1 source files
+Source /tmp/extract/src/embedded-sourcemap-test.ts written
+```
+
+If you have a source map on your file system already, use `file://` protocol like:
+```bash
+$ cd /tmp
+$ wget https://raw.githubusercontent.com/unblu/js-source-extractor/master/resources/embedded-sourcemap-test.js
+$ js-source-extractor file:///tmp/embedded-sourcemap-test.js 
+  Loading resource file:///tmp/embedded-sourcemap-test.js to examine (expecting javascript or source map)
+  Resource will be treated as a Javascript
+  Reading contents of file:///tmp/embedded-sourcemap-test.js
+  Found source map url
+  Extracting embedded source map
+  Source map references 1 source files
+  Source /tmp/extract/src/embedded-sourcemap-test.ts written
+
+```
+
+## Install as node module to use in your own project
 
 ```bash
 $ npm install --save-dev js-source-extractor
 ```
-
-#### CLI
-
-You can call js-source-extractor directly from the command line
-
-```bash
-$ ./dist/js-source-extractor.js ----help
-                                  
-Usage: js-source-extractor [options] <resourceUrl>
-                                  
-Extracts source from javascript frameworks with sourcemap information (containing the source)
-                                  
-Options:
-                                  
-  -V, --version  output the version number
-  -o --outDir    Base output directory where source files should be output to
-  -i --include   Include pattern to apply when selecting source files for extraction
-  -e --exclude   Exclude pattern to apply when selecting source files for extraction (executed after include pattern)
-  -h, --help     output usage information
-```
-
-To extract a test javascript containing a source map with source code embedded, use
-```bash
-$ ./dist/js-source-extractor.js file://$(pwd)/resources/embedded-sourcemap-test.js --outDir /tmp/js-source-extractor-test
-file:///.../resources/embedded-sourcemap-test.js
-Loading resource file:///.../resources/embedded-sourcemap-test.js to examine (expecting javascript or source map)
-Resource will be treated as a Javascript
-Reading contents of file:///.../resources/embedded-sourcemap-test.js
-Found source map url
-Extracting embedded source map
-Source map references 1 source files
-Source /tmp/js-source-extractor-test/src/embedded-sourcemap-test.ts written
-```
-
-Source file is extracted to `--outDir`, in the above case `/tmp/js-source-extractor-test/src/embedded-sourcemap-test.ts`
-
-#### Use as a module
 
 To extract source code from a sourcemap embedded in a javascript and call a callback per source file, use:
 
