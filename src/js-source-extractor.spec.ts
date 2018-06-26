@@ -1,3 +1,9 @@
+/*
+ * js-source-extractor
+ * Copyright(c) 2018 Kay Huber
+ * ISC Licensed
+ */
+
 import {cli, extractSrc, extractSrcToDir} from './js-source-extractor';
 import * as chai from 'chai';
 import {URL} from "url";
@@ -60,6 +66,15 @@ describe('Command Line Interface CLI', () => {
                 const outFileName = outDir + '/src/embedded-sourcemap-test.ts';
                 expect(existsSync(outFileName), 'extracted source file exists').to.be.true;
                 expect(readFileSync(outFileName).toString('utf-8'), 'source code').to.equal('console.log(\'Hello World!\');');
+            })
+            .then((result) => cleanup(true, result, outDir), (error) => cleanup(false, error, outDir));
+    });
+
+    it('Sourcemap embedded in Javascript file with include/exclude filter', () => {
+        return expect(cli(['/usr/bin/node', __dirname + '/js-source-extractor', embeddedSourcemapTestUrl.toString(), '--outDir', outDir, '--exclude', 'src'])).to.eventually.be.fulfilled
+            .then(() => {
+                const outFileName = outDir + '/src/embedded-sourcemap-test.ts';
+                expect(existsSync(outFileName), 'extracted source file exists').to.be.false;
             })
             .then((result) => cleanup(true, result, outDir), (error) => cleanup(false, error, outDir));
     });

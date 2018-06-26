@@ -221,7 +221,13 @@ export async function extractSrc(resourceUrl: URL | null, sourceMap: string | nu
         console.info(util.format("Source map references %d source files", consumer.sources.length));
 
         consumer.sources.forEach((sourceRef) => {
-            if (!srcIncludeEff.test(sourceRef) || (typeof srcExclude !== 'undefined' && srcExclude.test(sourceRef))) {
+            if (!srcIncludeEff.test(sourceRef)) {
+                console.log(util.format('Skipping %s: does not match include pattern'), sourceRef);
+                return;
+            }
+
+            if (typeof srcExclude !== 'undefined' && srcExclude.test(sourceRef)) {
+                console.log(util.format('Skipping %s: matched exclude pattern', sourceRef));
                 return;
             }
 
@@ -260,8 +266,8 @@ exports.extractSrc = extractSrc;
 
 interface Options {
     outDir: string;
-    includePattern?: string;
-    excludePattern?: string;
+    include?: string;
+    exclude?: string;
 }
 
 /**
@@ -307,7 +313,7 @@ export function cli(args: string[]): Promise<number> {
                     return;
                 }
 
-                extractSrcToDir(realResourceUrl, null, options.outDir, undefined, options.includePattern ? new RegExp(options.includePattern) : undefined, options.excludePattern ? new RegExp(options.excludePattern) : undefined).then(() => resolve(0));
+                extractSrcToDir(realResourceUrl, null, options.outDir, undefined, options.include ? new RegExp(options.include) : undefined, options.exclude ? new RegExp(options.exclude) : undefined).then(() => resolve(0));
             });
 
         program.parse(args);
