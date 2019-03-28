@@ -96,7 +96,7 @@ import { URL } from "url";
 import { extractSrcToDir } from 'js-source-extractor'
 
 const outDir = tmpdir() + '/js-source-extractor-test'; // directory to store source files in
-await extractSrcToDir(new URL('https://raw.githubusercontent.com/unblu/js-source-extractor/master/resources/embedded-sourcemap-test.js'), outDir);
+await extractSrcToDir(new URL('https://raw.githubusercontent.com/unblu/js-source-extractor/master/resources/embedded-sourcemap-test.js'), null, outDir);
 ```
 
 ## Running the tests
